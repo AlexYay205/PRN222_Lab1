@@ -1,0 +1,171 @@
+@model IEnumerable<Vegan.Entities.DuyLD.Models.VeganPlaceDuyLd>
+
+@{
+    ViewData["Title"] = "Deposit";
+    var places = Model?.ToList() ?? new List<Vegan.Entities.DuyLD.Models.VeganPlaceDuyLd>();
+    var totalPlaces = places.Count;
+    var activePlaces = places.Count(p => p.IsActive);
+    var categoryCount = places
+        .Where(p => !string.IsNullOrWhiteSpace(p.CategoryName))
+        .Select(p => p.CategoryName)
+        .Distinct()
+        .Count();
+    var ratedPlaces = places.Where(p => p.Rating.HasValue).ToList();
+    var averageRating = ratedPlaces.Any() ? ratedPlaces.Average(p => p.Rating!.Value) : 0;
+    var placeSearch = ViewData["PlaceSearch"] as string ?? string.Empty;
+    var categorySearch = ViewData["CategorySearch"] as string ?? string.Empty;
+    var statusSearch = ViewData["StatusSearch"] as string ?? string.Empty;
+    var hasSearchCondition = !string.IsNullOrWhiteSpace(placeSearch)
+        || !string.IsNullOrWhiteSpace(categorySearch)
+        || !string.IsNullOrWhiteSpace(statusSearch);
+}
+
+<section class="deposit-shell">
+    <div class="deposit-header">
+        <div>
+            <p class="deposit-eyebrow">Vegan places</p>
+            <h1>Deposit</h1>
+            <p class="deposit-subtitle">Manage vegan locations, categories, ratings, and availability from one place.</p>
+        </div>
+        <a class="btn btn-primary deposit-primary-action" asp-action="Create">Create New</a>
+    </div>
+
+    <div class="deposit-metrics" aria-label="Deposit summary">
+        <div class="deposit-metric">
+            <span>Total places</span>
+            <strong>@totalPlaces</strong>
+        </div>
+        <div class="deposit-metric">
+            <span>Active</span>
+            <strong>@activePlaces</strong>
+        </div>
+        <div class="deposit-metric">
+            <span>Categories</span>
+            <strong>@categoryCount</strong>
+        </div>
+        <div class="deposit-metric">
+            <span>Avg rating</span>
+            <strong>@averageRating.ToString("0.0")</strong>
+        </div>
+    </div>
+
+    <form class="deposit-toolbar deposit-search-form" asp-action="Index" method="get">
+        <div class="deposit-search">
+            <label class="form-label" for="placeSearch">Place</label>
+            <input id="placeSearch" name="place" class="form-control" type="search" value="@placeSearch" placeholder="Search by place name" autocomplete="off" />
+        </div>
+
+        <div class="deposit-search">
+            <label class="form-label" for="categorySearch">Category</label>
+            <input id="categorySearch" name="category" class="form-control" type="search" value="@categorySearch" placeholder="Search by category" autocomplete="off" />
+        </div>
+
+        <div class="deposit-search">
+            <label class="form-label" for="statusSearch">Status</label>
+            <input id="statusSearch" name="status" class="form-control" type="search" value="@statusSearch" placeholder="Active or Inactive" autocomplete="off" list="statusOptions" />
+            <datalist id="statusOptions">
+                <option value="Active"></option>
+                <option value="Inactive"></option>
+            </datalist>
+        </div>
+
+        <div class="deposit-search-actions">
+            <button class="btn btn-primary deposit-primary-action" type="submit">Search</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Clear</a>
+        </div>
+    </form>
+
+    <div class="deposit-table-wrap">
+        <table id="depositTable" class="table deposit-table align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Place</th>
+                    <th>Category</th>
+                    <th>Contact</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="depositTableBody">
+                @if (!places.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="deposit-empty">@(hasSearchCondition ? "No matching places." : "No places yet.")</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in places)
+                    {
+                        var status = item.IsActive ? "active" : "inactive";
+                        var categoryName = string.IsNullOrWhiteSpace(item.CategoryName) ? "Uncategorized" : item.CategoryName;
+                        <tr data-place="@item.PlaceName.ToLowerInvariant()" data-category="@categoryName.ToLowerInvariant()" data-status="@status">
+                            <td class="deposit-id-cell">@item.VeganPlaceDuyLdid</td>
+                            <td class="deposit-place-cell">
+                                <strong>@item.PlaceName</strong>
+                                <span>@item.Address</span>
+                            </td>
+                            <td>
+                                <span class="deposit-category">@categoryName</span>
+                            </td>
+                            <td class="deposit-contact-cell">
+                                @if (!string.IsNullOrWhiteSpace(item.Phone))
+                                {
+                                    <span>@item.Phone</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(item.Website))
+                                {
+                                    <a href="@item.Website" target="_blank" rel="noopener noreferrer">Website</a>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Rating.HasValue)
+                                {
+                                    <span class="deposit-rating">@item.Rating.Value.ToString("0.0")</span>
+                                }
+                                else
+                                {
+                                    <span class="deposit-muted">N/A</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="deposit-status deposit-status-@status">@(item.IsActive ? "Active" : "Inactive")</span>
+                            </td>
+                            <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                <div class="deposit-actions">
+                                    <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@item.VeganPlaceDuyLdid">Details</a>
+                                    <a class="btn btn-sm btn-outline-secondary" asp-action="Edit" asp-route-id="@item.VeganPlaceDuyLdid">Edit</a>
+                                    <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.VeganPlaceDuyLdid">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation-unobtrusive/table-pagination.js" asp-append-version="true"></script>
+    <script>
+        $(function () {
+            const rowCount = $('#depositTable tbody tr[data-place]').length;
+
+            if (rowCount > 5) {
+                $('#depositTable').createTablePagination({
+                    rowPerPage: 5,
+                    paginationColor: '#2f6f73',
+                    fontColor: '#415463',
+                    paginationStyle: 'bordered',
+                    transitionDuration: 120,
+                    jumpPage: true
+                });
+            }
+        });
+    </script>
+}
