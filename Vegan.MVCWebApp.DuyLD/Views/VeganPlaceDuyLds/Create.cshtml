@@ -74,6 +74,7 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="button" id="btnCreateBySignalR" value="Create by SignalR" class="btn btn-success" />
             </div>
         </form>
     </div>
@@ -85,4 +86,65 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/veganHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.serverTimeoutInMilliseconds = 120000;
+        connection.keepAliveIntervalInMilliseconds = 30000;
+
+        connection.start()
+            .then(function () {
+                console.log("Connected to the SignalR Hub");
+            })
+            .catch(function (err) {
+                return console.error(err.toString());
+            });
+
+        document.getElementById("btnCreateBySignalR").addEventListener("click", async function (event) {
+            event.preventDefault();
+
+            if (connection.state === signalR.HubConnectionState.Disconnected) {
+                await connection.start();
+            }
+
+            if (connection.state !== signalR.HubConnectionState.Connected) {
+                alert("SignalR connection is not ready. Please try again.");
+                return;
+            }
+
+            const readNullableNumber = function (id) {
+                const value = document.getElementById(id).value;
+                return value ? Number(value) : null;
+            };
+
+            var dataObj = JSON.stringify({
+                CategoryName: document.getElementById("CategoryName").value,
+                CategoryDescription: document.getElementById("CategoryDescription").value,
+                CategoryDisplayOrder: readNullableNumber("CategoryDisplayOrder"),
+                PlaceName: document.getElementById("PlaceName").value,
+                Address: document.getElementById("Address").value,
+                Phone: document.getElementById("Phone").value,
+                Website: document.getElementById("Website").value,
+                Description: document.getElementById("Description").value,
+                Latitude: readNullableNumber("Latitude"),
+                Longitude: readNullableNumber("Longitude"),
+                Rating: readNullableNumber("Rating"),
+                IsActive: document.getElementById("IsActive").checked
+            });
+
+            console.log(dataObj);
+
+            connection.invoke("HubCreate_VeganPlaceServiceDuyLd", dataObj).then(function () {
+                alert("Data had been create");
+                window.location.href = "/VeganPlaceDuyLds";
+            }).catch(function (err) {
+                return console.error(err.toString());
+            });
+        });
+    </script>
 }

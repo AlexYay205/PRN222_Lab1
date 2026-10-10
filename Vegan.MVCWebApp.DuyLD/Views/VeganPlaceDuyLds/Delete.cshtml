@@ -93,7 +93,36 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="VeganPlaceDuyLdid" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <input type="submit" value="Delete" class="btn btn-danger" /> 
+        <input type="button" id="btnDeleteBySignalR" value="Delete by SignalR" class="btn btn-success" />
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/veganHub")
+        .build();
+
+    connection.start().catch(err => console.error(err.toString()));
+
+    $("#btnDeleteBySignalR").on("click", function () {
+        const id = "@Model.VeganPlaceDuyLdid";
+
+        connection.invoke("HubDelete_VeganPlaceServiceDuyLd", id)
+            .then(function () {
+                alert("Data had been delete");
+                window.location.href = "/VeganPlaceDuyLds";
+            })
+            .catch(err => console.error(err.toString()));
+    });
+
+    connection.on("Receiver_DeleteVeganPlaceServiceDuyLd", function (id) {
+        $("#depositTableBodyID").find("#vegan-place-" + id).remove();
+    });
+
+</script>

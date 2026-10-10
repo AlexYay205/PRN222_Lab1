@@ -172,6 +172,37 @@ body {
   padding: 0 1rem;
 }
 
+.deposit-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-top: 1px solid #ecf1f3;
+  padding: 0.9rem 1rem;
+}
+
+.deposit-page-btn {
+  min-width: 2.4rem;
+  min-height: 2.25rem;
+  border: 1px solid #bccbd3;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #415463;
+  font-weight: 700;
+}
+
+.deposit-page-btn:hover:not(:disabled),
+.deposit-page-btn.active {
+  border-color: #2f6f73;
+  background: #2f6f73;
+  color: #ffffff;
+}
+
+.deposit-page-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .deposit-table {
   min-width: 1040px;
   margin: 0;

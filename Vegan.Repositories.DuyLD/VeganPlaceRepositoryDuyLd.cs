@@ -20,6 +20,7 @@ namespace Vegan.Repositories.DuyLD
         {
             return await _context.VeganPlaceDuyLds
                 .Include(p => p.PlaceFoodDuyLds)
+                .OrderBy(p => p.VeganPlaceDuyLdid)
                 .ToListAsync();
         }
 
@@ -51,7 +52,9 @@ namespace Vegan.Repositories.DuyLD
                 query = query.Where(p => p.IsActive == isActive.Value);
             }
 
-            return await query.ToListAsync();
+            return await query
+                .OrderBy(p => p.VeganPlaceDuyLdid)
+                .ToListAsync();
         }
     }
 }

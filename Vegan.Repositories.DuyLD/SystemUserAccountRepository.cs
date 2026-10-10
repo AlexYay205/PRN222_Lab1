@@ -15,13 +15,10 @@ namespace Vegan.Repositories.DuyLD
         public SystemUserAccountRepository(VeganDBContext context) => _context = context;
         public async Task<SystemUserAccount?> GetUserAccount(string userName, string password)
         {
-            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.Email == userName && u.Password == password && u.IsActive);
-
-            //return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.UserName == userName && u.Password == password && u.IsActive);
-
-            //return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.Phone == userName && u.Password == password && u.IsActive);
-
-            //return await _context.SystemUserAccounts.FirstOrDefaultAsync(u => u.EmployeeCode == userName && u.Password == password && u.IsActive);
+            return await _context.SystemUserAccounts.FirstOrDefaultAsync(u =>
+                (u.UserName == userName || u.Email == userName)
+                && u.Password == password
+                && u.IsActive);
         }
     }
 }
