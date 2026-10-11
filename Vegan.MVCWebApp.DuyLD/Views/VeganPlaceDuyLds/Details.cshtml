@@ -4,7 +4,6 @@
     ViewData["Title"] = "Details";
 }
 
-<div id="veganPlaceDetailsPanel" data-place-id="@Model?.VeganPlaceDuyLdid">
 <h1>Details</h1>
 
 <div>
@@ -92,39 +91,5 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.VeganPlaceDuyLdid">Edit</a> |
-    <input type="button" id="btnDeleteBySignalR" value="Delete by SignalR" class="btn btn-success btn-sm" /> |
     <a asp-action="Index">Back to List</a>
 </div>
-</div>
-
-<div id="veganPlaceDeletedMessage" class="alert alert-warning d-none" role="alert">
-    This table has been deleted.
-</div>
-
-@section Scripts {
-    <script src="~/js/signalr/dist/browser/signalr.js"></script>
-
-    <script>
-        const currentVeganPlaceId = "@Model?.VeganPlaceDuyLdid";
-
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/veganHub").build();
-
-        connection.start().catch(err => console.error(err.toString()));
-
-        $("#btnDeleteBySignalR").on("click", function () {
-            connection.invoke("HubDelete_VeganPlaceServiceDuyLd", currentVeganPlaceId)
-                .catch(err => console.error(err.toString()));
-        });
-
-        connection.on("Receiver_DeleteVeganPlaceServiceDuyLd", function (id) {
-            $("#depositTableBodyID").find("#vegan-place-" + id).remove();
-
-            if (id.toString() === currentVeganPlaceId) {
-                $("#veganPlaceDetailsPanel").addClass("d-none");
-                $("#veganPlaceDeletedMessage").removeClass("d-none");
-            }
-        });
-    </script>
-}

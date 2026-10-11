@@ -272,7 +272,7 @@
             $("#depositTableBodyID").find(".deposit-empty").closest("tr").remove();
 
             var trVeganPlaceDuyLd = `
-                <tr class="bg-warning text-danger fw-bold" id="vegan-place-${item.veganPlaceDuyLdid}" data-place="${item.placeName}" data-category="${item.categoryName}" data-status="${item.isActive ? "active" : "inactive"}">
+                <tr class="table-success text-success fw-bold" id="vegan-place-${item.veganPlaceDuyLdid}" data-place="${item.placeName}" data-category="${item.categoryName}" data-status="${item.isActive ? "active" : "inactive"}">
                     <td>${item.veganPlaceDuyLdid}</td>
                     <td>${item.placeName}</td>
                     <td>${item.categoryName}</td>
@@ -291,7 +291,7 @@
 
         connection.on("Receiver_UpdateVeganPlaceServiceDuyLd", function (item) {
             var trVeganPlaceDuyLd = `
-                <tr class="bg-warning text-danger fw-bold" id="vegan-place-${item.veganPlaceDuyLdid}" data-place="${item.placeName}" data-category="${item.categoryName}" data-status="${item.isActive ? "active" : "inactive"}">
+                <tr class="table-success text-success fw-bold" id="vegan-place-${item.veganPlaceDuyLdid}" data-place="${item.placeName}" data-category="${item.categoryName}" data-status="${item.isActive ? "active" : "inactive"}">
                     <td>${item.veganPlaceDuyLdid}</td>
                     <td>${item.placeName}</td>
                     <td>${item.categoryName}</td>
